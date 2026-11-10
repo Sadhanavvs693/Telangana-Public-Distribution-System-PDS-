@@ -1,0 +1,5 @@
+kmeans_cluster,avg_monthly_transactions,avg_monthly_ration_cards,transactions_per_ration_card,total_rice,total_transaction_amount,total_sugar
+0,407.49,532.8,0.73,225753.38,21433.65,146.17
+1,452.08,538.89,0.79,252655.33,1056.03,0.15
+2,948.04,907.88,0.99,564835.49,266094.08,480.86
+3,194.62,272.44,0.7,106060.51,801.5,10.34

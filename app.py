@@ -138,7 +138,44 @@ xgb_importance = load_csv(
         "final_future_xgboost_feature_importance.csv"
     )
 )
+# ============================================================
+# LOAD CLUSTERING OUTPUT FILES
+# ============================================================
 
+shop_clusters = load_csv(
+    os.path.join(
+        OUTPUT_DIR,
+        "shop_clustering_results.csv"
+    )
+)
+
+kmeans_profiles = load_csv(
+    os.path.join(
+        OUTPUT_DIR,
+        "kmeans_cluster_profiles.csv"
+    )
+)
+
+dbscan_distribution = load_csv(
+    os.path.join(
+        OUTPUT_DIR,
+        "dbscan_cluster_distribution.csv"
+    )
+)
+
+district_clusters = load_csv(
+    os.path.join(
+        OUTPUT_DIR,
+        "district_cluster_distribution.csv"
+    )
+)
+
+pca_variance = load_csv(
+    os.path.join(
+        OUTPUT_DIR,
+        "pca_explained_variance.csv"
+    )
+)
 
 # ============================================================
 # CHECK MASTER DATA
@@ -202,7 +239,8 @@ page = st.sidebar.radio(
         "🚨 Anomaly Detection",
         "🤖 ML Prediction",
         "🔍 Shop Investigation",
-        "💡 Business Insights"
+        "💡 Business Insights",
+        "🧩 Shop Clustering"
     ]
 )
 
@@ -1149,6 +1187,140 @@ elif page == "💡 Business Insights":
             f"• {action}"
         )
 
+
+# ============================================================
+# SHOP CLUSTERING
+# ============================================================
+
+elif page == "🧩 Shop Clustering":
+
+    st.header("🧩 Shop Clustering Analysis")
+
+    st.write(
+        "Explore shop activity patterns using "
+        "PCA, K-Means clustering and DBSCAN."
+    )
+
+    # --------------------------------------------------------
+    # CLUSTERING OVERVIEW
+    # --------------------------------------------------------
+
+    st.subheader("Clustering Overview")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            "Shops Analysed",
+            f"{len(shop_clusters):,}"
+        )
+
+    with col2:
+        if "kmeans_cluster" in shop_clusters.columns:
+            st.metric(
+                "K-Means Clusters",
+                shop_clusters["kmeans_cluster"].nunique()
+            )
+
+    with col3:
+        if "dbscan_cluster" in shop_clusters.columns:
+            noise_count = (
+                shop_clusters["dbscan_cluster"] == -1
+            ).sum()
+
+            st.metric(
+                "DBSCAN Noise Shops",
+                f"{noise_count:,}"
+            )
+
+    st.divider()
+
+    # --------------------------------------------------------
+    # K-MEANS CLUSTER PROFILES
+    # --------------------------------------------------------
+
+    st.subheader("K-Means Cluster Profiles")
+
+    st.dataframe(
+        kmeans_profiles,
+        use_container_width=True
+    )
+
+    # --------------------------------------------------------
+    # DBSCAN CLUSTER DISTRIBUTION
+    # --------------------------------------------------------
+
+    st.subheader("DBSCAN Cluster Distribution")
+
+    st.dataframe(
+        dbscan_distribution,
+        use_container_width=True
+    )
+
+    # --------------------------------------------------------
+    # DISTRICT CLUSTER DISTRIBUTION
+    # --------------------------------------------------------
+
+    st.subheader("District-wise Cluster Distribution")
+
+    st.dataframe(
+        district_clusters,
+        use_container_width=True
+    )
+
+    # --------------------------------------------------------
+    # PCA EXPLAINED VARIANCE
+    # --------------------------------------------------------
+
+    st.subheader("PCA Explained Variance")
+
+    st.dataframe(
+        pca_variance,
+        use_container_width=True
+    )
+
+    # --------------------------------------------------------
+    # CLUSTERING VISUALIZATIONS
+    # --------------------------------------------------------
+
+    st.subheader("Clustering Visualizations")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.image(
+            os.path.join(
+                OUTPUT_DIR,
+                "kmeans_pca_clusters.png"
+            ),
+            caption="K-Means Clusters using PCA",
+            use_container_width=True
+        )
+
+    with col2:
+        st.image(
+            os.path.join(
+                OUTPUT_DIR,
+                "kmeans_cluster_distribution.png"
+            ),
+            caption="K-Means Cluster Distribution",
+            use_container_width=True
+        )
+
+    st.image(
+        os.path.join(
+            OUTPUT_DIR,
+            "dbscan_cluster_distribution.png"
+        ),
+        caption="DBSCAN Cluster Distribution",
+        use_container_width=True
+    )
+
+    st.info(
+        "DBSCAN noise points indicate shops that do not meet "
+        "the selected density criteria. They should not be "
+        "interpreted as poor-performing or fraudulent shops."
+    )
 
 # ============================================================
 # FOOTER
